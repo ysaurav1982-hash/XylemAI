@@ -59,10 +59,10 @@ def chat():
             timeout=30
         )
 
-        if response.status_code != 200:
-            return jsonify({
-                "reply": f"API Error: {response.text}"
-            })
+if response.status_code != 200:
+    return jsonify({
+        "reply": "I'm sorry, Xylem.AI is temporarily unavailable. Please try again in a few moments."
+    })
 
         result = response.json()
 
@@ -72,11 +72,10 @@ def chat():
             "reply": reply
         })
 
-    except Exception as e:
-        return jsonify({
-            "reply": f"Error: {str(e)}"
-        })
-
+except Exception:
+    return jsonify({
+        "reply": "I'm sorry, Xylem.AI is temporarily unavailable. Please try again in a few moments."
+    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
