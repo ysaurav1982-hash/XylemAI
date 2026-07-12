@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify, render_template
 import requests
+import os
 
 app = Flask(__name__)
-import os
 
 API_KEY = os.environ.get("API_KEY")
 MODEL = "models/gemini-flash-latest"
@@ -24,6 +24,8 @@ Rules:
 @app.route("/")
 def home():
     return render_template("index.html")
+
+
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
@@ -59,10 +61,10 @@ def chat():
             timeout=30
         )
 
-if response.status_code != 200:
-    return jsonify({
-        "reply": "I'm sorry, Xylem.AI is temporarily unavailable. Please try again in a few moments."
-    })
+        if response.status_code != 200:
+            return jsonify({
+                "reply": "Xylem.AI is currently experiencing unusually high demand. Please try again in a few moments. Thank you for your patience."
+            })
 
         result = response.json()
 
@@ -72,10 +74,11 @@ if response.status_code != 200:
             "reply": reply
         })
 
-except Exception:
-    return jsonify({
-        "reply": "I'm sorry, Xylem.AI is temporarily unavailable. Please try again in a few moments."
-    })
+    except Exception:
+        return jsonify({
+            "reply": "Xylem.AI is currently experiencing unusually high demand. Please try again in a few moments. Thank you for your patience."
+        })
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
