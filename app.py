@@ -68,7 +68,11 @@ def chat():
 
         result = response.json()
 
-        reply = result["candidates"][0]["content"]["parts"][0]["text"]
+reply = result["candidates"][0]["content"]["parts"][0]["text"]
+
+# Remove Markdown formatting
+reply = reply.replace("**", "")
+reply = reply.replace("*", "")
 
         return jsonify({
             "reply": reply
