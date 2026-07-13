@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 API_KEY = os.environ.get("API_KEY")
-MODEL = "models/gemini-flash-latest"
+MODEL = "models/gemini-2.5-flash"
 
 SYSTEM_PROMPT = """
 You are Xylem.AI.
@@ -33,7 +33,10 @@ def chat():
     if not data:
         return jsonify({"reply": "No message received."})
 
-    user_message = data.get("message", "")
+    user_message = data.get("message", "").strip()
+
+    if not user_message:
+        return jsonify({"reply": "Please enter a message."})
 
     url = f"https://generativelanguage.googleapis.com/v1beta/{MODEL}:generateContent?key={API_KEY}"
 
@@ -68,11 +71,20 @@ def chat():
 
         result = response.json()
 
-reply = result["candidates"][0]["content"]["parts"][0]["text"]
+        if (
+            "candidates" not in result
+            or not result["candidates"]
+            or "content" not in result["candidates"][0]
+        ):
+            return jsonify({
+                "reply": "Xylem.AI is currently experiencing unusually high demand. Please try again in a few moments. Thank you for your patience."
+            })
 
-# Remove Markdown formatting
-reply = reply.replace("**", "")
-reply = reply.replace("*", "")
+        reply = result["candidates"][0]["content"]["parts"][0]["text"]
+
+        # Remove markdown formatting
+        reply = reply.replace("**", "")
+        reply = reply.replace("*", "")
 
         return jsonify({
             "reply": reply
